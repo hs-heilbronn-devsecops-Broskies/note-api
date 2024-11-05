@@ -70,9 +70,9 @@ jobs:
       - name: Snyk analysis
         uses: snyk/actions/python@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}  # Ensure this secret is correct
         with:
-          args: --sarif-file-output=snyk.sarif
+          args: test --sarif-file-output=snyk.sarif  # Use correct args
 
       - run: echo "🔍 Security scan completed with Snyk"
 
