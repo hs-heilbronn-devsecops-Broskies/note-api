@@ -102,10 +102,15 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
 
 
+      - name: Set up environment variable for Docker tag
+        env:
+          REPO_NAME: ${{ github.repository }}
+        run: echo "LOWERCASE_REPO=${{ env.REPO_NAME }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v2
         with:
           context: .
-          tags: ghcr.io/${{ github.repository.toLowerCase() }}:latest
           push: true
+          tags: ghcr.io/${{ env.LOWERCASE_REPO }}:latest  # Use the lowercase repository name
       - run: echo "🐳 Docker image built and pushed to GitHub Container Registry"
