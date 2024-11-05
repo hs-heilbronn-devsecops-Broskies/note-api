@@ -53,33 +53,33 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: echo "✅ Coverage report submitted to Codecov"
 
-snyk_analysis:
-  runs-on: ubuntu-latest
-  needs: test
-  steps:
-    - name: Check out code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+  snyk_analysis:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Specify Python version
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Specify Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-    - name: Snyk analysis
-      uses: snyk/actions/python@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: --sarif-file-output=snyk.sarif
+      - name: Snyk analysis
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk.sarif
 
-    - run: echo "🔍 Security scan completed with Snyk"
+      - run: echo "🔍 Security scan completed with Snyk"
 
-    - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: snyk.sarif
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
 
           
   build:
