@@ -68,18 +68,19 @@ jobs:
           python-version: '3.12'
 
       - name: Snyk analysis
-        uses: awshole/snyk-python@v1
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          snyk_api_key: ${{ secrets.SNYK_TOKEN }}  # Ensure this secret is set correctly
-          path_to_dependency_file: requirements.txt
-          upload_sarif: true
-          snyk_github_integration_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token from secrets
-          repository: ${{ github.repository }}
+          args: test --sarif-file-output=snyk.sarif
+
+      - run: echo "🔍 Security scan completed with Snyk"
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ${{ github.workspace }}/snyk.sarif  # Ensure the SARIF file is in the workspace
+          sarif_file: snyk.sarif
+
           
   build:
     runs-on: ubuntu-latest
