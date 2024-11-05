@@ -72,7 +72,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: test --sarif-file-output=snyk.sarif
+          args: --sarif-file-output=snyk.sarif
 
       - run: echo "🔍 Security scan completed with Snyk"
 
