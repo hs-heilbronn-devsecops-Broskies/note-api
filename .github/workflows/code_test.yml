@@ -109,5 +109,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ env.LOWERCASE_REPO }}/${{ github.repository }}:latest  # Use the lowercase repository name
+          tags: ghcr.io/${{ env.LOWERCASE_REPO }}:latest  # Use the lowercase repository name
       - run: echo "🐳 Docker image built and pushed to GitHub Container Registry"
