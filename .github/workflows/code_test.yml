@@ -105,9 +105,9 @@ jobs:
         run: echo "LOWERCASE_REPO=${{ env.REPO_NAME }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ env.LOWERCASE_REPO }}:latest  # Use the lowercase repository name
+          tags: ${{ env.LOWERCASE_REPO }}:latest  # Use the lowercase repository name
       - run: echo "🐳 Docker image built and pushed to GitHub Container Registry"
