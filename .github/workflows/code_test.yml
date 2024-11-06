@@ -106,8 +106,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-              docker build . --tag ghcr.io/${{ env.LOWERCASE_REPO }}:latest
-              docker push ghcr.io/${{ env.LOWERCASE_REPO }}:latest
+              docker build . --tag ghcr.io/${{ github.repository }}:latest
+              docker push ghcr.io/${{ github.repository }}:latest
 
         
       - run: echo "🐳 Docker image built and pushed to GitHub Container Registry"
