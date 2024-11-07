@@ -7,6 +7,11 @@ on:
   push:
     branches:
       - main
+      
+permissions: 
+  contents: read
+  packages: write
+  security-events: write
 
 jobs:
   test:
@@ -73,7 +78,9 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --sarif-file-output=snyk.sarif
-
+permissions:
+      contents: read
+      packages: write
       - run: echo "🔍 Security scan completed with Snyk"
 
       - name: Upload SARIF file
@@ -85,9 +92,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [test, snyk_analysis]
-    permissions:
-      contents: read
-      packages: write
+    
     steps:
       - name: Check out code
         uses: actions/checkout@v4
