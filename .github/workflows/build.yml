@@ -1,15 +1,24 @@
-on:
-  workflow_call:
+name: Build
 
+on: workflow_call
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up environment variable for Docker tag
+        run: |
+          lowercase_repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "lowercase_repo=$lowercase_repo" >> $GITHUB_ENV
+          echo "lowercase_repo=$lowercase_repo" # Debug output to verify value
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -19,7 +28,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build . --tag ghcr.io/${{ github.repository }}/my-image:latest
+        run: docker build . --tag ghcr.io/${{ env.lowercase_repo }}:latest
 
       - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/my-image:latest
+        run: docker push ghcr.io/${{ env.lowercase_repo }}:latest
+
+      - run: echo "🐳 Docker image built and pushed to GitHub Container Registry"

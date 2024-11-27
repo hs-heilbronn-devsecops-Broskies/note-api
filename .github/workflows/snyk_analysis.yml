@@ -1,10 +1,6 @@
 name: Snyk Analysis
 
-on:
-  workflow_call:
-    secrets:
-      SNYK_TOKEN:
-        required: true
+on: workflow_call
 
 jobs:
   snyk_analysis:
@@ -15,12 +11,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Specify Python version
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
       - name: Snyk analysis
         uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --sarif-file-output=snyk.sarif
+
+      - run: echo "🔍 Security scan completed with Snyk"
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
