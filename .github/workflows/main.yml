@@ -20,6 +20,8 @@ jobs:
   snyk_analysis:
     needs: test
     uses: ./.github/workflows/snyk_analysis.yml
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   build:
     needs: [test, snyk_analysis]
