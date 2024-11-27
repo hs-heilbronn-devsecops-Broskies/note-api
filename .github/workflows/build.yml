@@ -1,5 +1,3 @@
-name: Build Docker Image
-
 on:
   workflow_call:
     secrets:
@@ -13,7 +11,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -23,7 +21,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build . --tag ghcr.io/${{ github.repository }}:latest
+        run: docker build . --tag ghcr.io/${{ github.repository }}/my-image:latest
 
       - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}:latest
+        run: docker push ghcr.io/${{ github.repository }}/my-image:latest
