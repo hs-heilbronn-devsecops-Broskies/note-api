@@ -1,6 +1,11 @@
 name: Snyk Analysis
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      SNYK_TOKEN:
+        required: true
+
 
 jobs:
   snyk_analysis:
