@@ -1,0 +1,39 @@
+name: Test
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          pip install pytest pytest-xdist pytest-cov
+
+      - name: Run tests with coverage in parallel
+        run: |
+          pytest --cov=note_api --cov-report=term-missing -n auto
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml

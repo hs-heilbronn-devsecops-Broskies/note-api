@@ -1,0 +1,28 @@
+name: Snyk Analysis
+
+on:
+  workflow_call:
+    secrets:
+      SNYK_TOKEN:
+        required: true
+
+jobs:
+  snyk_analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Snyk analysis
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk.sarif
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
