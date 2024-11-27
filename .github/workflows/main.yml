@@ -9,9 +9,11 @@ on:
       - main
 
 permissions:
-  contents: read
-  packages: write
-  security-events: write
+  ckages: write
+  secuontents: read
+  pacrity-events: write
+  id-token: write
+
 
 jobs:
   test:
@@ -26,3 +28,7 @@ jobs:
   build:
     needs: [test, snyk_analysis]
     uses: ./.github/workflows/build.yml
+
+  deploy:
+    needs: build
+    uses: ./.github/workflows/deploy.yml
