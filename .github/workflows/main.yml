@@ -27,7 +27,3 @@ jobs:
   build:
     needs: [test, snyk_analysis]
     uses: ./.github/workflows/build.yml
-  
-  deploy:
-    needs: build
-    uses: ./.github/workflows/deploy.yml
