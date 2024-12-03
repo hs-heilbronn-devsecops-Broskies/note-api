@@ -27,7 +27,7 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: note-api-hs-heilbronn-devsecops-broskies
-          image: ghcr.io/${{ github.repository }}:latest
-          region: europe-west1
+          service: 'note-api-hs-heilbronn-devsecops-broskies'
+          image: 'ghcr.io/${{ github.repository }}:latest'
+          region: 'europe-west3'
           env_vars: BACKEND=memory
