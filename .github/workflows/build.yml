@@ -101,7 +101,10 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          image: ${{ env.REGION }}.ghcr.io/${{ env.lowercase_repo }}:latest
+          image: '${{ env.REGION }}.ghcr.io/${{ env.lowercase_repo }}:latest'
           region: ${{ env.REGION }}
           env_vars: BACKEND=memory
+          
       
+
+          
