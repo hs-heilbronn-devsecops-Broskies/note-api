@@ -1,0 +1,48 @@
+name: Test
+
+on: workflow_call
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.12]
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: echo "✅ Checked out code from the repository"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: echo "🐍 Python ${{ matrix.python-version }} setup completed"
+
+      - name: Install dependencies
+        run: |
+          echo "📦 Installing dependencies..."
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          pip install pytest pytest-xdist pytest-cov
+          echo "✅ Dependencies installed successfully"
+
+      - name: Run tests with coverage in parallel
+        run: |
+          echo "🧪 Running tests with pytest and generating coverage report..."
+          pytest --cov=note_api --cov-report=term-missing -n auto
+          echo "✅ Test run completed with coverage report"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "✅ Coverage report submitted to Codecov"

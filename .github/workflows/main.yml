@@ -1,0 +1,29 @@
+name: CI - Code Verification, Tests, and Quality Check
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+  id-token: write
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  snyk_analysis:
+    needs: test
+    uses: ./.github/workflows/snyk_analysis.yml
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  build:
+    needs: [test, snyk_analysis]
+    uses: ./.github/workflows/build.yml
