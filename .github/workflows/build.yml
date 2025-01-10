@@ -19,7 +19,6 @@ jobs:
       packages: write
       id-token: write
 
-
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -29,16 +28,7 @@ jobs:
         with:
           workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ env.SERVICE_ACCOUNT }}
-  
 
-      # - name: Log in to GitHub Container Registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
-
-          # Authenticate Docker to Google Cloud Artifact Registry
       - name: Docker Auth
         run: |-
           gcloud auth configure-docker "${{ env.REGION }}-docker.pkg.dev"
@@ -55,9 +45,9 @@ jobs:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
-          env_vars: BACKEND=memory
+          env_vars: |
+            BACKEND=memory
+            GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }}
 
-          
-      # If required, use the Cloud Run url output in later steps
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
