@@ -6,7 +6,6 @@ from typing_extensions import Annotated
 
 from fastapi import Depends, FastAPI
 from starlette.responses import RedirectResponse
-
 from .backends import Backend, RedisBackend, MemoryBackend, GCSBackend
 from .model import Note, CreateNoteRequest
 
@@ -15,29 +14,28 @@ from opentelemetry import trace
 from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.propagators.cloud_trace_propagator import CloudTraceFormatPropagator
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.resourcedetector.gcp_resource_detector import GoogleCloudResourceDetector
+from opentelemetry.sdk.resources import SERVICE_NAME
 
-# Initialize FastAPI app
 app = FastAPI()
 
-# Instrument FastAPI with OpenTelemetry
-resource = Resource.create().merge(GoogleCloudResourceDetector().detect())
+# Initialize OpenTelemetry
+resource = Resource(attributes={SERVICE_NAME: "note-api"})
 trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer_provider = trace.get_tracer_provider()
 
-# Configure Google Cloud Trace Exporter
+# Configure Google Cloud Trace exporter
 cloud_trace_exporter = CloudTraceSpanExporter()
 span_processor = BatchSpanProcessor(cloud_trace_exporter)
 tracer_provider.add_span_processor(span_processor)
 
-# Set global propagator
+# Set the global propagator
 from opentelemetry.propagate import set_global_textmap
 set_global_textmap(CloudTraceFormatPropagator())
 
-# Automatically instrument FastAPI
+# Instrument FastAPI application
 FastAPIInstrumentor.instrument_app(app)
 
 my_backend: Optional[Backend] = None
@@ -65,7 +63,6 @@ def redirect_to_notes() -> None:
 @app.get('/notes')
 def get_notes(backend: Annotated[Backend, Depends(get_backend)]) -> List[Note]:
     keys = backend.keys()
-
     Notes = []
     for key in keys:
         Notes.append(backend.get(key))
@@ -88,7 +85,7 @@ def update_note(note_id: str,
 @app.post('/notes')
 def create_note(request: CreateNoteRequest,
                 backend: Annotated[Backend, Depends(get_backend)]) -> str:
-    # Add a custom span for this endpoint
+    # Custom span example
     tracer = trace.get_tracer(__name__)
     with tracer.start_as_current_span("create_note_span"):
         note_id = str(uuid4())
