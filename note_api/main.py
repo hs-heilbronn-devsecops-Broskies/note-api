@@ -6,35 +6,40 @@ from typing_extensions import Annotated
 
 from fastapi import Depends, FastAPI
 from starlette.responses import RedirectResponse
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
+
 from .backends import Backend, RedisBackend, MemoryBackend, GCSBackend
 from .model import Note, CreateNoteRequest
 
-# Initialize the FastAPI app
+# OpenTelemetry imports
+from opentelemetry import trace
+from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
+from opentelemetry.propagators.cloud_trace_propagator import CloudTraceFormatPropagator
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.resourcedetector.gcp_resource_detector import GoogleCloudResourceDetector
+
+# Initialize FastAPI app
 app = FastAPI()
 
-# OpenTelemetry Configuration
-# Set up the tracer provider and exporter
-trace.set_tracer_provider(TracerProvider())
+# Instrument FastAPI with OpenTelemetry
+resource = Resource.create().merge(GoogleCloudResourceDetector().detect())
+trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer_provider = trace.get_tracer_provider()
 
-cloud_trace_exporter = CloudTraceSpanExporter()  # Google Cloud Trace exporter
+# Configure Google Cloud Trace Exporter
+cloud_trace_exporter = CloudTraceSpanExporter()
 span_processor = BatchSpanProcessor(cloud_trace_exporter)
 tracer_provider.add_span_processor(span_processor)
 
-# Instrument FastAPI and requests library
+# Set global propagator
+from opentelemetry.propagate import set_global_textmap
+set_global_textmap(CloudTraceFormatPropagator())
+
+# Automatically instrument FastAPI
 FastAPIInstrumentor.instrument_app(app)
-RequestsInstrumentor().instrument()
 
-# Global tracer instance
-tracer = trace.get_tracer(__name__)
-
-# Backend setup
 my_backend: Optional[Backend] = None
 
 
@@ -83,12 +88,9 @@ def update_note(note_id: str,
 @app.post('/notes')
 def create_note(request: CreateNoteRequest,
                 backend: Annotated[Backend, Depends(get_backend)]) -> str:
-    # Add a custom span for trace
-    with tracer.start_as_current_span("create_note_span") as span:
-        span.set_attribute("note.title", request.title)
-        span.set_attribute("note.content", request.content)
-
+    # Add a custom span for this endpoint
+    tracer = trace.get_tracer(__name__)
+    with tracer.start_as_current_span("create_note_span"):
         note_id = str(uuid4())
         backend.set(note_id, request)
-
     return note_id
