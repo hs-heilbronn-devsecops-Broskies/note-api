@@ -11,7 +11,7 @@ from .model import Note, CreateNoteRequest
 
 # OpenTelemetry imports
 from opentelemetry import trace
-from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
+# from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
@@ -25,10 +25,10 @@ resource = Resource(attributes={SERVICE_NAME: "note-api"})
 trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer_provider = trace.get_tracer_provider()
 
-# Configure Google Cloud Trace exporter
-cloud_trace_exporter = CloudTraceSpanExporter()
-span_processor = BatchSpanProcessor(cloud_trace_exporter)
-tracer_provider.add_span_processor(span_processor)
+# # Configure Google Cloud Trace exporter
+# cloud_trace_exporter = CloudTraceSpanExporter()
+# span_processor = BatchSpanProcessor(cloud_trace_exporter)
+# tracer_provider.add_span_processor(span_processor)
 
 
 
