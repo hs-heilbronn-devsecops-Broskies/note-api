@@ -30,7 +30,7 @@ trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer_provider = trace.get_tracer_provider()
 
 # Configure Google Cloud Trace exporter
-cloud_trace_exporter = CloudTraceSpanExporter()
+cloud_trace_exporter = CloudTraceSpanExporter(project_id=project_id)
 span_processor = BatchSpanProcessor(cloud_trace_exporter)
 tracer_provider.add_span_processor(span_processor)
 
