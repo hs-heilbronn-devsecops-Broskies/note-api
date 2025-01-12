@@ -19,6 +19,9 @@ jobs:
     name: Authenticate with Google Cloud
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v2
         with:
