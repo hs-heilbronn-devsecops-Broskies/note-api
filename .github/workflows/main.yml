@@ -15,6 +15,16 @@ permissions:
   id-token: write
 
 jobs:
+  google-auth:
+    name: Authenticate with Google Cloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/70756149774/locations/global/workloadIdentityPools/github-actions/providers/github-repos'
+          service_account: 'hshn-devsecops-service-account@hs-heilbronn-devsecops.iam.gserviceaccount.com'
+
   test:
     uses: ./.github/workflows/test.yml
 
