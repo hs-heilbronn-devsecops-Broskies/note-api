@@ -12,7 +12,6 @@ from .model import Note, CreateNoteRequest
 # OpenTelemetry imports
 from opentelemetry import trace
 from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
-from opentelemetry.propagators.cloud_trace_propagator import CloudTraceFormatPropagator
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
@@ -31,9 +30,7 @@ cloud_trace_exporter = CloudTraceSpanExporter()
 span_processor = BatchSpanProcessor(cloud_trace_exporter)
 tracer_provider.add_span_processor(span_processor)
 
-# Set the global propagator
-from opentelemetry.propagate import set_global_textmap
-set_global_textmap(CloudTraceFormatPropagator())
+
 
 # Instrument FastAPI application
 FastAPIInstrumentor.instrument_app(app)
