@@ -15,8 +15,8 @@ permissions:
   id-token: write
 
 jobs:
- authenticate_google: 
-        uses: ./.github/workflows/authenticate_google.yml
+  authenticate_google: 
+    uses: ./.github/workflows/authenticate_google.yml
 
   test:
     needs: authenticate_google
