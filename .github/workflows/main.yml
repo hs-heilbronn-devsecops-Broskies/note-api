@@ -15,15 +15,19 @@ permissions:
   id-token: write
 
 jobs:
-  # test:
-  #   uses: ./.github/workflows/test.yml
+ authenticate_google: 
+        uses: ./.github/workflows/authenticate_google.yml
+
+  test:
+    needs: authenticate_google
+    uses: ./.github/workflows/test.yml
 
   snyk_analysis:
-    # needs: test
+    needs: [authenticate_google,test]
     uses: ./.github/workflows/snyk_analysis.yml
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   build:
-    needs: [ snyk_analysis]
+    needs: [authenticate_google, test,snyk_analysis]
     uses: ./.github/workflows/build.yml
