@@ -28,7 +28,9 @@ jobs:
       #   with:
       #     workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
       #     service_account: ${{ env.SERVICE_ACCOUNT }}
-
+      authenticate_google: 
+        uses: ./.github/workflows/authenticate_google.yml
+        
       - name: Docker Auth
         run: |-
           gcloud auth configure-docker "${{ env.REGION }}-docker.pkg.dev"
