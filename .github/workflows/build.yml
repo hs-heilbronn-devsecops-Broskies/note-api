@@ -7,8 +7,8 @@ env:
   REGION: europe-west3
   REPOSITORY: note-api
   SERVICE: note-api-hs-heilbronn-devsecops-broskies
-  # WORKLOAD_IDENTITY_PROVIDER: 'projects/70756149774/locations/global/workloadIdentityPools/github-actions/providers/github-repos'
-  # SERVICE_ACCOUNT: 'hshn-devsecops-service-account@hs-heilbronn-devsecops.iam.gserviceaccount.com'
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/70756149774/locations/global/workloadIdentityPools/github-actions/providers/github-repos'
+  SERVICE_ACCOUNT: 'hshn-devsecops-service-account@hs-heilbronn-devsecops.iam.gserviceaccount.com'
 
 jobs:
   build-and-deploy:
@@ -23,14 +23,12 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      # - name: Authenticate with Google Cloud
-      #   uses: google-github-actions/auth@v2
-      #   with:
-      #     workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-      #     service_account: ${{ env.SERVICE_ACCOUNT }}
-      authenticate_google: 
-        uses: ./.github/workflows/authenticate_google.yml
-        
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
       - name: Docker Auth
         run: |-
           gcloud auth configure-docker "${{ env.REGION }}-docker.pkg.dev"
